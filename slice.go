@@ -95,13 +95,13 @@ func Value(slice interface{}) flag.Value {
 func toFlagValue(t reflect.Type) (reflect.Value, flag.Value, bool) {
 	fvt := reflect.TypeOf((*flag.Value)(nil)).Elem()
 	if t.Implements(fvt) {
+		var v reflect.Value
 		if t.Kind() == reflect.Ptr {
-			v := reflect.New(t.Elem())
-			return v, v.Interface().(flag.Value), true
+			v = reflect.New(t.Elem())
 		} else {
-			v := reflect.Zero(t)
-			return v, v.Interface().(flag.Value), true
+			v = reflect.Zero(t)
 		}
+		return v, v.Interface().(flag.Value), true
 	}
 	if t.Kind() != reflect.Ptr && reflect.PtrTo(t).Implements(fvt) {
 		v := reflect.New(t)
