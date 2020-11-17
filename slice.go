@@ -15,6 +15,9 @@ type sliceValue struct {
 }
 
 func (sv sliceValue) String() string {
+	if !sv.slice.IsValid() {
+		return ""
+	}
 	ss := make([]string, sv.slice.Len())
 	for i := 0; i < sv.slice.Len(); i++ {
 		ss[i] = fmt.Sprint(sv.slice.Index(i))
