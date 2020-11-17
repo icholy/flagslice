@@ -11,7 +11,7 @@
 * `float64`
 * `string`
 * `time.Duration`
-* `flag.Value`
+* anything implementing `flag.Value`
 
 ## Example
 
