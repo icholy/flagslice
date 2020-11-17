@@ -10,7 +10,6 @@ func TestValue(t *testing.T) {
 	tests := []struct {
 		name   string
 		args   []string
-		slice  interface{}
 		expect interface{}
 	}{
 		{
@@ -40,8 +39,8 @@ func TestValue(t *testing.T) {
 					t.Errorf("arg %q: %v", a, err)
 				}
 			}
-			if reflect.DeepEqual(tt.slice, tt.expect) {
-				t.Errorf("expected %v, got %v", tt.expect, tt.slice)
+			if s := ptr.Elem().Interface(); !reflect.DeepEqual(s, tt.expect) {
+				t.Errorf("expected %v, got %v", tt.expect, s)
 			}
 		})
 	}
