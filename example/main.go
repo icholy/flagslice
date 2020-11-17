@@ -9,7 +9,7 @@ import (
 
 func main() {
 	var names []string
-	flag.Var(flagslice.Slice(&names), "name", "a name")
+	flag.Var(flagslice.Value(&names), "name", "a name")
 	flag.Parse()
 	for _, name := range names {
 		fmt.Println(name)

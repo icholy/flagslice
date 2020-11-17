@@ -31,9 +31,9 @@ func (sv sliceValue) Set(s string) error {
 	return nil
 }
 
-// Slice accepts a pointer to slice and returns a flag.Value which appends
+// Value accepts a pointer to slice and returns a flag.Value which appends
 // a value to the slice for each call to Set.
-func Slice(slice interface{}) flag.Value {
+func Value(slice interface{}) flag.Value {
 	p := reflect.ValueOf(slice)
 	if p.Kind() != reflect.Ptr {
 		panic(fmt.Sprintf("expected pointer to slice, got %s", p.Type()))

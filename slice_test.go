@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func TestSlice(t *testing.T) {
+func TestValue(t *testing.T) {
 	tests := []struct {
 		name   string
 		args   []string
@@ -34,7 +34,7 @@ func TestSlice(t *testing.T) {
 			slice := reflect.MakeSlice(reflect.TypeOf(tt.expect), 0, 0)
 			ptr := reflect.New(slice.Type())
 			ptr.Elem().Set(slice)
-			v := Slice(ptr.Interface())
+			v := Value(ptr.Interface())
 			for _, a := range tt.args {
 				if err := v.Set(a); err != nil {
 					t.Errorf("arg %q: %v", a, err)
