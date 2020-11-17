@@ -40,13 +40,10 @@ func (sv sliceValue) Set(s string) error {
 // a value to the slice for each call to Set.
 func Value(slice interface{}) flag.Value {
 	p := reflect.ValueOf(slice)
-	if p.Kind() != reflect.Ptr {
+	if p.Kind() != reflect.Ptr || p.Elem().Kind() != reflect.Slice {
 		panic(fmt.Sprintf("expected pointer to slice, got %s", p.Type()))
 	}
 	s := p.Elem()
-	if s.Kind() != reflect.Slice {
-		panic(fmt.Sprintf("expected pointer to slice, got %s", p.Type()))
-	}
 	conv, ok := toConv(s.Type().Elem())
 	if !ok {
 		panic(fmt.Sprintf("unsupported slice type %s", s.Type()))
