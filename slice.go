@@ -9,9 +9,11 @@ import (
 	"time"
 )
 
+type conv func(s string) (interface{}, error)
+
 type sliceValue struct {
 	slice reflect.Value
-	set   func(s string) (interface{}, error)
+	conv  conv
 }
 
 func (sv sliceValue) String() string {
@@ -26,7 +28,7 @@ func (sv sliceValue) String() string {
 }
 
 func (sv sliceValue) Set(s string) error {
-	v, err := sv.set(s)
+	v, err := sv.conv(s)
 	if err != nil {
 		return err
 	}
@@ -45,54 +47,61 @@ func Value(slice interface{}) flag.Value {
 	if s.Kind() != reflect.Slice {
 		panic(fmt.Sprintf("expected pointer to slice, got %s", p.Type()))
 	}
-	et := s.Type().Elem()
+	conv, ok := toConv(s.Type().Elem())
+	if !ok {
+		panic(fmt.Sprintf("unsupported slice type %s", s.Type()))
+	}
+	return sliceValue{slice: s, conv: conv}
+}
+
+func toConv(t reflect.Type) (conv, bool) {
 	// check if the element type implement flag.Value
-	if _, _, ok := toFlagValue(et); ok {
-		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
-			v, fv, _ := toFlagValue(et)
+	if _, _, ok := toFlagValue(t); ok {
+		return func(s string) (interface{}, error) {
+			v, fv, _ := toFlagValue(t)
 			err := fv.Set(s)
 			return v.Interface(), err
-		}}
+		}, true
 	}
 	// special case time.Duration
-	if et == reflect.TypeOf(time.Duration(0)) {
-		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
+	if t == reflect.TypeOf(time.Duration(0)) {
+		return func(s string) (interface{}, error) {
 			return time.ParseDuration(s)
-		}}
+		}, true
 	}
-	switch et.Kind() {
+	switch t.Kind() {
 	case reflect.Bool:
-		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
+		return func(s string) (interface{}, error) {
 			return strconv.ParseBool(s)
-		}}
+		}, true
 	case reflect.Float64:
-		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
+		return func(s string) (interface{}, error) {
 			return strconv.ParseFloat(s, 64)
-		}}
+		}, true
 	case reflect.Int:
-		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
+		return func(s string) (interface{}, error) {
 			x, err := strconv.ParseInt(s, 0, strconv.IntSize)
 			return int(x), err
-		}}
+		}, true
 	case reflect.Int64:
-		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
+		return func(s string) (interface{}, error) {
 			return strconv.ParseInt(s, 0, 64)
-		}}
+		}, true
 	case reflect.Uint:
-		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
+		return func(s string) (interface{}, error) {
 			x, err := strconv.ParseUint(s, 0, strconv.IntSize)
 			return uint(x), err
-		}}
+		}, true
 	case reflect.Uint64:
-		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
+		return func(s string) (interface{}, error) {
 			return strconv.ParseUint(s, 0, 64)
-		}}
+		}, true
 	case reflect.String:
-		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
+		return func(s string) (interface{}, error) {
 			return s, nil
-		}}
+		}, true
 	default:
-		panic(fmt.Sprintf("unsupported slice type %s", s.Type()))
+		return nil, false
 	}
 }
 
