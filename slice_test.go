@@ -39,9 +39,14 @@ func TestValue(t *testing.T) {
 			expect: []time.Duration{2 * time.Second, 10 * time.Minute, 0},
 		},
 		{
-			name:   "pointer to custom",
+			name:   "custom pointers",
 			args:   []string{"a", "b"},
 			expect: []*custom{{"a"}, {"b"}},
+		},
+		{
+			name:   "custom values",
+			args:   []string{"a", "b"},
+			expect: []custom{{"a"}, {"b"}},
 		},
 	}
 	for _, tt := range tests {
