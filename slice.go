@@ -42,12 +42,27 @@ func Value(slice interface{}) flag.Value {
 	if s.Kind() != reflect.Slice {
 		panic(fmt.Sprintf("expected pointer to slice, got %s", p.Type()))
 	}
-	if s.Type().Elem() == reflect.TypeOf(time.Duration(0)) {
+	et := s.Type().Elem()
+	// check if the element type implement flag.Value
+	if et.Implements(reflect.TypeOf((*flag.Value)(nil)).Elem()) {
+		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
+			var v flag.Value
+			if et.Kind() == reflect.Ptr {
+				v = reflect.New(et.Elem()).Interface().(flag.Value)
+			} else {
+				v = reflect.Zero(et).Interface().(flag.Value)
+			}
+			err := v.Set(s)
+			return v, err
+		}}
+	}
+	// special case time.Duration
+	if et == reflect.TypeOf(time.Duration(0)) {
 		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
 			return time.ParseDuration(s)
 		}}
 	}
-	switch s.Type().Elem().Kind() {
+	switch et.Kind() {
 	case reflect.Bool:
 		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
 			return strconv.ParseBool(s)
@@ -80,4 +95,12 @@ func Value(slice interface{}) flag.Value {
 	default:
 		panic(fmt.Sprintf("unsupported slice type %s", s.Type()))
 	}
+}
+
+func isFlagValue(t reflect.Type) bool {
+	fv := reflect.TypeOf((*flag.Value)(nil)).Elem()
+	if t.Kind() != reflect.Ptr {
+		t = reflect.PtrTo(t)
+	}
+	return t.Implements(fv)
 }

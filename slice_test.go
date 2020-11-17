@@ -6,6 +6,17 @@ import (
 	"time"
 )
 
+type custom struct {
+	Value string
+}
+
+func (c custom) String() string { return c.Value }
+
+func (c *custom) Set(s string) error {
+	c.Value = s
+	return nil
+}
+
 func TestValue(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -26,6 +37,11 @@ func TestValue(t *testing.T) {
 			name:   "duration",
 			args:   []string{"2s", "10m", "0"},
 			expect: []time.Duration{2 * time.Second, 10 * time.Minute, 0},
+		},
+		{
+			name:   "pointer to custom",
+			args:   []string{"a", "b"},
+			expect: []*custom{{"a"}, {"b"}},
 		},
 	}
 	for _, tt := range tests {
