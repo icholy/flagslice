@@ -1,4 +1,6 @@
-flagslice
+# flagslice
+
+> This package provides a reflect based solution for reads flags into a slice.
 
 ``` go
 package main
