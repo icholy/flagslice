@@ -9,13 +9,16 @@ import (
 	"time"
 )
 
+// conv parses an argument string
 type conv func(s string) (interface{}, error)
 
+// sliceValue is a flag.Value implementation
 type sliceValue struct {
 	slice reflect.Value
 	conv  conv
 }
 
+// String implements flag.Value
 func (sv sliceValue) String() string {
 	if !sv.slice.IsValid() {
 		return ""
@@ -27,6 +30,7 @@ func (sv sliceValue) String() string {
 	return strings.Join(ss, ", ")
 }
 
+// Set implements flag.Value
 func (sv sliceValue) Set(s string) error {
 	v, err := sv.conv(s)
 	if err != nil {
@@ -52,8 +56,10 @@ func Value(slice interface{}) flag.Value {
 	return sliceValue{slice: s, conv: conv}
 }
 
+// toConv returns a function which returns a function that
+// converts a string to the provided type t.
 func toConv(t reflect.Type) (conv, bool) {
-	// check if the element type implement flag.Value
+	// check if the element type implements flag.Value
 	if _, _, ok := toFlagValue(t); ok {
 		return func(s string) (interface{}, error) {
 			v, fv, _ := toFlagValue(t)
@@ -67,6 +73,7 @@ func toConv(t reflect.Type) (conv, bool) {
 			return time.ParseDuration(s)
 		}, true
 	}
+	// check for supported underlying types
 	switch t.Kind() {
 	case reflect.Bool:
 		return func(s string) (interface{}, error) {
@@ -103,6 +110,7 @@ func toConv(t reflect.Type) (conv, bool) {
 	}
 }
 
+// toFlagValue creates a flag.Value if t implements flag.Value
 func toFlagValue(t reflect.Type) (reflect.Value, flag.Value, bool) {
 	fvt := reflect.TypeOf((*flag.Value)(nil)).Elem()
 	if t.Implements(fvt) {
