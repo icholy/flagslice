@@ -44,16 +44,11 @@ func Value(slice interface{}) flag.Value {
 	}
 	et := s.Type().Elem()
 	// check if the element type implement flag.Value
-	if et.Implements(reflect.TypeOf((*flag.Value)(nil)).Elem()) {
+	if _, _, ok := toFlagValue(et); ok {
 		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
-			var v flag.Value
-			if et.Kind() == reflect.Ptr {
-				v = reflect.New(et.Elem()).Interface().(flag.Value)
-			} else {
-				v = reflect.Zero(et).Interface().(flag.Value)
-			}
-			err := v.Set(s)
-			return v, err
+			v, fv, _ := toFlagValue(et)
+			err := fv.Set(s)
+			return v.Interface(), err
 		}}
 	}
 	// special case time.Duration
@@ -97,10 +92,14 @@ func Value(slice interface{}) flag.Value {
 	}
 }
 
-func isFlagValue(t reflect.Type) bool {
-	fv := reflect.TypeOf((*flag.Value)(nil)).Elem()
-	if t.Kind() != reflect.Ptr {
-		t = reflect.PtrTo(t)
+func toFlagValue(t reflect.Type) (reflect.Value, flag.Value, bool) {
+	fvt := reflect.TypeOf((*flag.Value)(nil)).Elem()
+	if !t.Implements(fvt) {
+		return reflect.Value{}, nil, false
 	}
-	return t.Implements(fv)
+	if t.Kind() == reflect.Ptr {
+		v := reflect.New(t.Elem())
+		return v, v.Interface().(flag.Value), true
+	}
+	return reflect.Value{}, nil, false
 }
