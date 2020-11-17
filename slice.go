@@ -71,20 +71,21 @@ func Value(slice interface{}) flag.Value {
 		}}
 	case reflect.Int:
 		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
-			return strconv.Atoi(s)
+			x, err := strconv.ParseInt(s, 0, strconv.IntSize)
+			return int(x), err
 		}}
 	case reflect.Int64:
 		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
-			return strconv.ParseInt(s, 10, 64)
+			return strconv.ParseInt(s, 0, 64)
 		}}
 	case reflect.Uint:
 		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
-			x, err := strconv.ParseUint(s, 10, 64)
+			x, err := strconv.ParseUint(s, 0, strconv.IntSize)
 			return uint(x), err
 		}}
 	case reflect.Uint64:
 		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
-			return strconv.ParseUint(s, 10, 64)
+			return strconv.ParseUint(s, 0, 64)
 		}}
 	case reflect.String:
 		return sliceValue{slice: s, set: func(s string) (interface{}, error) {
