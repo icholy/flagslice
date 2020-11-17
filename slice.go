@@ -103,7 +103,7 @@ func toFlagValue(t reflect.Type) (reflect.Value, flag.Value, bool) {
 		}
 		return v, v.Interface().(flag.Value), true
 	}
-	if t.Kind() != reflect.Ptr && reflect.PtrTo(t).Implements(fvt) {
+	if reflect.PtrTo(t).Implements(fvt) {
 		v := reflect.New(t)
 		return v.Elem(), v.Interface().(flag.Value), true
 	}
