@@ -32,7 +32,7 @@ func (sv sliceValue) Set(s string) error {
 }
 
 // Slice accepts a pointer to slice and returns a flag.Value which appends
-// a value to the slice for each call to Set. Values supported
+// a value to the slice for each call to Set.
 func Slice(slice interface{}) flag.Value {
 	p := reflect.ValueOf(slice)
 	if p.Kind() != reflect.Ptr {
