@@ -141,7 +141,7 @@ func TestFlagSet(t *testing.T) {
 	}); err != nil {
 		t.Fatal(err)
 	}
-	fset.Usage()
+	fset.VisitAll(func(f *flag.Flag) { _ = f.Value.String() })
 	if expect := []bool{true, false}; !reflect.DeepEqual(bools, expect) {
 		t.Errorf("expected %v, got %v", expect, bools)
 	}
