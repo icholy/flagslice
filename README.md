@@ -4,6 +4,7 @@
 
 ## Supported Types:
 
+* `bool`
 * `int`
 * `int64`
 * `uint`

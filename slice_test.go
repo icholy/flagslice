@@ -29,6 +29,11 @@ func TestValue(t *testing.T) {
 		expect interface{}
 	}{
 		{
+			name:   "bool",
+			args:   []string{"true", "false"},
+			expect: []bool{true, false},
+		},
+		{
 			name:   "int",
 			args:   []string{"1", "42", "999"},
 			expect: []int{1, 42, 999},
