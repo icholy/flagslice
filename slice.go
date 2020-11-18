@@ -9,6 +9,11 @@ import (
 	"time"
 )
 
+// Var defines a slice flag with specified name and usage string.
+func Var(slice interface{}, name, usage string) {
+	flag.Var(Value(slice), name, usage)
+}
+
 // sliceValue is a flag.Value implementation
 type sliceValue struct {
 	elem  reflect.Type
