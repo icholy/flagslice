@@ -24,14 +24,34 @@ func TestValue(t *testing.T) {
 		expect interface{}
 	}{
 		{
-			name:   "string",
-			args:   []string{"foo", "bar", "baz"},
-			expect: []string{"foo", "bar", "baz"},
-		},
-		{
 			name:   "int",
 			args:   []string{"1", "42", "999"},
 			expect: []int{1, 42, 999},
+		},
+		{
+			name:   "int64",
+			args:   []string{"1", "42", "999"},
+			expect: []int64{1, 42, 999},
+		},
+		{
+			name:   "uint",
+			args:   []string{"1", "42", "999"},
+			expect: []uint{1, 42, 999},
+		},
+		{
+			name:   "uint64",
+			args:   []string{"1", "42", "999"},
+			expect: []uint64{1, 42, 999},
+		},
+		{
+			name:   "uint64",
+			args:   []string{"1", "42", "999"},
+			expect: []float64{1, 42, 999},
+		},
+		{
+			name:   "string",
+			args:   []string{"foo", "bar", "baz"},
+			expect: []string{"foo", "bar", "baz"},
 		},
 		{
 			name:   "duration",
