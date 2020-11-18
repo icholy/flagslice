@@ -85,5 +85,23 @@ func TestValue(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestPanicOnInvalidSlice(t *testing.T) {
+	t.Run("non-pointer", func(t *testing.T) {
+		defer func() { recover() }()
+		Value([]string{})
+		t.Error("did not panic")
+	})
+	t.Run("non-slice", func(t *testing.T) {
+		defer func() { recover() }()
+		Value(new(int))
+		t.Error("did not panic")
+	})
+	t.Run("non-supported", func(t *testing.T) {
+		defer func() { recover() }()
+		var floats []float32
+		Value(&floats)
+		t.Error("did not panic")
+	})
 }
