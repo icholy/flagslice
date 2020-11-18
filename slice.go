@@ -11,6 +11,7 @@ import (
 
 // sliceValue is a flag.Value implementation
 type sliceValue struct {
+	elem  reflect.Type
 	slice reflect.Value
 	parse parseFn
 }
@@ -18,7 +19,13 @@ type sliceValue struct {
 // IsBoolFlag implements an optional interface which allows
 // passing bool flags without values.
 func (sv sliceValue) IsBoolFlag() bool {
-	return sv.slice.Type().Elem().Kind() == reflect.Bool
+	if _, fv, ok := toFlagValue(sv.elem); ok {
+		if bf, ok := fv.(interface{ IsBoolFlag() bool }); ok {
+			return bf.IsBoolFlag()
+		}
+		return false
+	}
+	return sv.elem.Kind() == reflect.Bool
 }
 
 // String implements flag.Value
@@ -52,11 +59,12 @@ func Value(slice interface{}) flag.Value {
 		panic(fmt.Sprintf("expected pointer to slice, got %s", p.Type()))
 	}
 	s := p.Elem()
-	parse, ok := toParseFn(s.Type().Elem())
+	et := s.Type().Elem()
+	parse, ok := toParseFn(et)
 	if !ok {
 		panic(fmt.Sprintf("unsupported slice type %s", s.Type()))
 	}
-	return sliceValue{slice: s, parse: parse}
+	return sliceValue{slice: s, parse: parse, elem: et}
 }
 
 // conv parses an argument string
