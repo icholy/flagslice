@@ -130,13 +130,13 @@ func TestPanicOnInvalidSlice(t *testing.T) {
 }
 
 func TestFlagSet(t *testing.T) {
-	fset := flag.NewFlagSet("", flag.ContinueOnError)
 	var (
 		bools    []bool
 		strings  []string
 		customs  []custom
 		customs2 []custom2
 	)
+	fset := flag.NewFlagSet("", flag.ContinueOnError)
 	fset.Var(Value(&strings), "s", "string")
 	fset.Var(Value(&bools), "b", "bool")
 	fset.Var(Value(&customs), "c", "custom")
