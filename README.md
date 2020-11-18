@@ -1,6 +1,6 @@
 # flagslice
 
-> This package provides a reflect based solution for reads flags into a slice.
+> This package provides a reflect based solution for reading flags into a slice.
 
 ## Supported Types:
 
