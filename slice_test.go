@@ -17,6 +17,11 @@ func (c *custom) Set(s string) error {
 	return nil
 }
 
+type custom2 struct{}
+
+func (c custom2) String() string     { return "" }
+func (c custom2) Set(s string) error { return nil }
+
 func TestValue(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -67,6 +72,16 @@ func TestValue(t *testing.T) {
 			name:   "custom values",
 			args:   []string{"a", "b"},
 			expect: []custom{{"a"}, {"b"}},
+		},
+		{
+			name:   "custom2 pointers",
+			args:   []string{"a", "b"},
+			expect: []*custom2{{}, {}},
+		},
+		{
+			name:   "custom2 values",
+			args:   []string{"a", "b"},
+			expect: []custom2{{}, {}},
 		},
 	}
 	for _, tt := range tests {
