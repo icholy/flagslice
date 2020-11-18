@@ -18,6 +18,12 @@ type sliceValue struct {
 	conv  conv
 }
 
+// IsBoolFlag implements an optional interface which allows
+// passing bool flags without values.
+func (sv sliceValue) IsBoolFlag() bool {
+	return sv.slice.Type().Elem().Kind() == reflect.Bool
+}
+
 // String implements flag.Value
 func (sv sliceValue) String() string {
 	if !sv.slice.IsValid() {
