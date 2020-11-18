@@ -1,5 +1,7 @@
 # flagslice
 
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/icholy/flagslice)](https://pkg.go.dev/github.com/icholy/flagslice)
+
 > This package provides a reflect based solution for reading flags into a slice.
 
 ## Supported Types:
