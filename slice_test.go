@@ -2,6 +2,7 @@ package flagslice
 
 import (
 	"flag"
+	"io/ioutil"
 	"reflect"
 	"testing"
 	"time"
@@ -137,6 +138,7 @@ func TestFlagSet(t *testing.T) {
 		customs2 []custom2
 	)
 	fset := flag.NewFlagSet("", flag.ContinueOnError)
+	fset.SetOutput(ioutil.Discard)
 	fset.Var(Value(&strings), "s", "string")
 	fset.Var(Value(&bools), "b", "bool")
 	fset.Var(Value(&customs), "c", "custom")
@@ -149,7 +151,7 @@ func TestFlagSet(t *testing.T) {
 	}); err != nil {
 		t.Fatal(err)
 	}
-	fset.VisitAll(func(f *flag.Flag) { _ = f.Value.String() })
+	fset.Usage()
 	if expect := []bool{true, false}; !reflect.DeepEqual(bools, expect) {
 		t.Errorf("expected %v, got %v", expect, bools)
 	}
