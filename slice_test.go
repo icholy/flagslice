@@ -1,6 +1,7 @@
 package flagslice
 
 import (
+	"flag"
 	"reflect"
 	"testing"
 	"time"
@@ -124,4 +125,27 @@ func TestPanicOnInvalidSlice(t *testing.T) {
 		Value(&floats)
 		t.Error("did not panic")
 	})
+}
+
+func TestFlagSet(t *testing.T) {
+	fset := flag.NewFlagSet("", flag.ContinueOnError)
+	var (
+		bools   = []bool{}
+		strings = []string{}
+	)
+	fset.Var(Value(&strings), "s", "string")
+	fset.Var(Value(&bools), "b", "bool")
+	if err := fset.Parse([]string{
+		"-s", "foo", "-s", "bar",
+		"-b", "-b=false",
+	}); err != nil {
+		t.Fatal(err)
+	}
+	fset.Usage()
+	if expect := []bool{true, false}; !reflect.DeepEqual(bools, expect) {
+		t.Errorf("expected %v, got %v", expect, bools)
+	}
+	if expect := []string{"foo", "bar"}; !reflect.DeepEqual(strings, expect) {
+		t.Errorf("expected %v, got %v", expect, strings)
+	}
 }
