@@ -67,7 +67,7 @@ func Value(slice interface{}) flag.Value {
 	return sliceValue{slice: s, parse: parse, elem: et}
 }
 
-// conv parses an argument string
+// parseFn parses an argument string
 type parseFn func(s string) (interface{}, error)
 
 // toParseFn returns a parsing function for the provided type t.
