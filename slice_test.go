@@ -13,6 +13,8 @@ type custom struct {
 
 func (c custom) String() string { return c.Value }
 
+func (c custom) IsBoolFlag() bool { return false }
+
 func (c *custom) Set(s string) error {
 	c.Value = s
 	return nil
@@ -130,14 +132,20 @@ func TestPanicOnInvalidSlice(t *testing.T) {
 func TestFlagSet(t *testing.T) {
 	fset := flag.NewFlagSet("", flag.ContinueOnError)
 	var (
-		bools   = []bool{}
-		strings = []string{}
+		bools    = []bool{}
+		strings  = []string{}
+		customs  = []custom{}
+		customs2 = []custom2{}
 	)
 	fset.Var(Value(&strings), "s", "string")
 	fset.Var(Value(&bools), "b", "bool")
+	fset.Var(Value(&customs), "c", "custom")
+	fset.Var(Value(&customs2), "c2", "custom2")
 	if err := fset.Parse([]string{
 		"-s", "foo", "-s", "bar",
 		"-b", "-b=false",
+		"-c", "thing",
+		"-c2", "thing2",
 	}); err != nil {
 		t.Fatal(err)
 	}
