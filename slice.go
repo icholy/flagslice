@@ -9,13 +9,10 @@ import (
 	"time"
 )
 
-// conv parses an argument string
-type conv func(s string) (interface{}, error)
-
 // sliceValue is a flag.Value implementation
 type sliceValue struct {
 	slice reflect.Value
-	conv  conv
+	parse parseFn
 }
 
 // IsBoolFlag implements an optional interface which allows
@@ -38,7 +35,7 @@ func (sv sliceValue) String() string {
 
 // Set implements flag.Value
 func (sv sliceValue) Set(s string) error {
-	v, err := sv.conv(s)
+	v, err := sv.parse(s)
 	if err != nil {
 		return err
 	}
@@ -55,16 +52,18 @@ func Value(slice interface{}) flag.Value {
 		panic(fmt.Sprintf("expected pointer to slice, got %s", p.Type()))
 	}
 	s := p.Elem()
-	conv, ok := toConv(s.Type().Elem())
+	parse, ok := toParseFn(s.Type().Elem())
 	if !ok {
 		panic(fmt.Sprintf("unsupported slice type %s", s.Type()))
 	}
-	return sliceValue{slice: s, conv: conv}
+	return sliceValue{slice: s, parse: parse}
 }
 
-// toConv returns a function which returns a function that
-// converts a string to the provided type t.
-func toConv(t reflect.Type) (conv, bool) {
+// conv parses an argument string
+type parseFn func(s string) (interface{}, error)
+
+// toParseFn returns a parsing function for the provided type t.
+func toParseFn(t reflect.Type) (parseFn, bool) {
 	// check if the element type implements flag.Value
 	if _, _, ok := toFlagValue(t); ok {
 		return func(s string) (interface{}, error) {
